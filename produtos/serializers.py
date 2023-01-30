@@ -6,5 +6,5 @@ from .models import Produto
 class ProdutoSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('nome', 'sku', 'preco', 'descricao', 'datahora_adicionado', 'datahora_modificado')
+        fields = ('nome', 'sku', 'preco', 'descricao')
         model = Produto
