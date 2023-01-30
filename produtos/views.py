@@ -49,15 +49,27 @@ class ProdutoImportCSV(generics.CreateAPIView):
 
 
 class ProdutoExportCSV(generics.ListAPIView):
-    queryset = Produto.objects.all()
     serializer_class = ProdutoSerializer
 
-    def get(self, requisicao, *args, **kwargs):
-        produtos = []
-        for produto in Produto.objects.all():
-            produtos.append({'nome': produto.nome, 'sku': produto.sku, 'preco': produto.preco, 
+    def get_queryset(self, requisicao):
+        queryset = Produto.objects.all()
+        nome_param = self.request.query_params.get('nome')
+        sku_param = self.request.query_params.get('sku')
+        preco_param = self.request.query_params.get('preco')
+        if nome_param is not None:
+            queryset = queryset.filter(nome=nome_param)
+        if sku_param is not None:
+            queryset = queryset.filter(sku=sku_param)
+        if preco_param is not None:
+            queryset = queryset.filter(preco=preco_param)
+        return queryset
+
+    def get(self, requisicao):
+        produtos_csv = []
+        for produto in self.get_queryset(requisicao):
+            produtos_csv.append({'nome': produto.nome, 'sku': produto.sku, 'preco': produto.preco, 
             'descricao': produto.descricao})
-        resultados = pandas.DataFrame(produtos)
+        resultados = pandas.DataFrame(produtos_csv)
 
         resposta = HttpResponse(content_type='text/csv')
         resposta['Content-Disposition'] = 'attachment; filename=export.csv'
