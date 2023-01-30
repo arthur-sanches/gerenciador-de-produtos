@@ -60,6 +60,7 @@ class ProdutoExportCSV(generics.ListAPIView):
         preco_param = self.request.query_params.get('preco')
         preco_maior_param = self.request.query_params.get('preco_maior')
         preco_menor_param = self.request.query_params.get('preco_menor')
+        descricao_param = self.request.query_params.get('descricao')
         if nome_param is not None:
             queryset = queryset.filter(nome=nome_param)
         if sku_param is not None:
@@ -70,6 +71,8 @@ class ProdutoExportCSV(generics.ListAPIView):
             queryset = queryset.filter(preco__gte=Decimal(_trata_preco(preco_maior_param)))
         if preco_menor_param is not None:
             queryset = queryset.filter(preco__lte=Decimal(_trata_preco(preco_menor_param)))
+        if descricao_param is not None:
+            queryset = queryset.filter(descricao__contains=descricao_param)
         return queryset
 
     def get(self, requisicao):

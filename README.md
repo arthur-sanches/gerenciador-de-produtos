@@ -45,11 +45,14 @@ Também é possível criar, ler, modificar e deletar produtos através de requis
         - preco
         - preco_maior
         - preco_menor
+        - descricao
     - Exemplos de url com parâmetros:
         - "api/export-csv/?sku=LO123REM45IPS"
             Exporta arquivo csv com somente um produto com sku igual a LO123REM45IPS.
         - "api/export-csv/?preco_maior=99.90"
             Exporta arquivo csv somente com produtos de preço maior ou igual a 99.90.
+        - "api/export-csv/?descricao=recortes coloridos"
+            Exporta arquivo csv somente com produtos que contenham 'recortes coloridos' na descrição.
 
 
 ### Características dos campos dos produtos:
