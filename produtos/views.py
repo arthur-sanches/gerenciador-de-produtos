@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from django.http import HttpResponse
+
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -46,6 +48,20 @@ class ProdutoImportCSV(generics.CreateAPIView):
         return Decimal(preco.replace(',', '.'))
 
 
-class ProdutoExportCSV(generics.RetrieveAPIView):
+class ProdutoExportCSV(generics.ListAPIView):
     queryset = Produto.objects.all()
     serializer_class = ProdutoSerializer
+
+    def get(self, requisicao, *args, **kwargs):
+        produtos = []
+        for produto in Produto.objects.all():
+            produtos.append({'nome': produto.nome, 'sku': produto.sku, 'preco': produto.preco, 
+            'descricao': produto.descricao})
+        resultados = pandas.DataFrame(produtos)
+
+        resposta = HttpResponse(content_type='text/csv')
+        resposta['Content-Disposition'] = 'attachment; filename=export.csv'
+
+        resultados.to_csv(path_or_buf=resposta,sep=';',float_format='%.2f',index=False,decimal=",")
+        return resposta
+        
