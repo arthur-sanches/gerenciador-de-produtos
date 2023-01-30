@@ -17,6 +17,8 @@ Também é possível criar, ler, modificar e deletar produtos através de requis
     - "pip install -r requirements.txt"
 - se você usou o passo recomendado anteriormente (pipenv) use o seguinte comando para iniciar o env:
     - "pipenv shell"
+- rode o comando a seguir para configurar o banco do django:
+    - "python manage.py migrate"
 - inicie o servidor django com o comando:
     - "python manage.py runserver"
 - o serviço está pronto para testes através da url:
