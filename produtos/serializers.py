@@ -8,3 +8,7 @@ class ProdutoSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('nome', 'sku', 'preco', 'descricao')
         model = Produto
+
+
+class CSVUploadSerializer(serializers.Serializer):
+    csv = serializers.FileField()
