@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.http import HttpResponse
+from django.db.models import Q
 
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -9,6 +10,10 @@ import pandas
 
 from .models import Produto
 from .serializers import ProdutoSerializer, CSVUploadSerializer
+
+
+def _trata_preco(preco):
+        return Decimal(preco.replace(',', '.'))
 
 
 class ProdutoList(generics.ListCreateAPIView):
@@ -35,7 +40,7 @@ class ProdutoImportCSV(generics.CreateAPIView):
                 new_file = Produto(
                         nome = row['nome'],
                         sku= row["sku"],
-                        preco= self._trata_preco(row['preco']),
+                        preco= _trata_preco(row['preco']),
                         descricao= row["descricao"]
                         )
                 new_file.save()
@@ -43,9 +48,6 @@ class ProdutoImportCSV(generics.CreateAPIView):
                 print(e)
         return Response({"status": "success"},
                         status.HTTP_201_CREATED)
-
-    def _trata_preco(self, preco):
-        return Decimal(preco.replace(',', '.'))
 
 
 class ProdutoExportCSV(generics.ListAPIView):
@@ -56,12 +58,18 @@ class ProdutoExportCSV(generics.ListAPIView):
         nome_param = self.request.query_params.get('nome')
         sku_param = self.request.query_params.get('sku')
         preco_param = self.request.query_params.get('preco')
+        preco_maior_param = self.request.query_params.get('preco_maior')
+        preco_menor_param = self.request.query_params.get('preco_menor')
         if nome_param is not None:
             queryset = queryset.filter(nome=nome_param)
         if sku_param is not None:
             queryset = queryset.filter(sku=sku_param)
         if preco_param is not None:
-            queryset = queryset.filter(preco=preco_param)
+            queryset = queryset.filter(preco=_trata_preco(preco_param))
+        if preco_maior_param is not None:
+            queryset = queryset.filter(preco__gte=Decimal(_trata_preco(preco_maior_param)))
+        if preco_menor_param is not None:
+            queryset = queryset.filter(preco__lte=Decimal(_trata_preco(preco_menor_param)))
         return queryset
 
     def get(self, requisicao):
